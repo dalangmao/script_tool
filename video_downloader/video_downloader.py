@@ -26,7 +26,7 @@ Returns:
     无
 
 Modify:
-    2017-05-09
+    2018.9.20
 """
 class APP:
     def __init__(self, width = 500, height = 300):
@@ -37,7 +37,6 @@ class APP:
         self.url = tk.StringVar()
         self.v = tk.IntVar()
         self.v.set(1)
-
 
         #Frame空间
         frame_1 = tk.Frame(self.root)
@@ -52,7 +51,7 @@ class APP:
         menu.add_cascade(label = '菜单', menu = filemenu)
         menu.add_cascade(label = '友情链接', menu = moviemenu)
         filemenu.add_command(label = '使用说明',command = lambda :webbrowser.open('http://blog.csdn.net/c406495762/article/details/71334633'))
-        filemenu.add_command(label = '关于作者',command = lambda :webbrowser.open('http://blog.csdn.net/c406495762'))
+        filemenu.add_command(label = '关于作者',command = lambda :webbrowser.open('https://www.cnblogs.com/tuijin/'))
         filemenu.add_command(label = '退出',command = self.root.quit)
 
         #各个网站链接
@@ -72,7 +71,7 @@ class APP:
         group = tk.Label(frame_1,text = '请选择一个视频播放通道：', padx = 10, pady = 10)
         tb1 = tk.Radiobutton(frame_1,text = '通道一', variable = self.v, value = 1, width = 10, height = 3)
         tb2 = tk.Radiobutton(frame_1,text = '通道二', variable = self.v, value = 2, width = 10, height = 3)
-        tb3 = tk.Radiobutton(frame_1,text = '通道三', variable = self.v, value = 2, width = 10, height = 3)
+        tb3 = tk.Radiobutton(frame_1,text = '通道三', variable = self.v, value = 3, width = 10, height = 3)
         label1 = tk.Label(frame_2, text = "请输入视频链接：")
         entry = tk.Entry(frame_2, textvariable = self.url, highlightcolor = 'Fuchsia', highlightthickness = 1,width = 35)
         label2 = tk.Label(frame_2, text = " ")
@@ -81,9 +80,7 @@ class APP:
         download = tk.Button(frame_2, text = "下载", font = ('楷体',12), fg = 'Purple', width = 2, height = 1, command = self.download_wmxz)
         QR_Code = tk.Button(frame_3, text = "手机观看", font = ('楷体',12), fg = 'Purple', width = 10, height = 2, command = self.QR_Code)
         label_explain = tk.Label(frame_3, fg = 'red', font = ('楷体',12), text = '\n注意：支持大部分主流视频网站的视频播放！\n此软件仅用于交流学习，请勿用于任何商业用途！')
-        label_warning = tk.Label(frame_3, fg = 'blue', font = ('楷体',12),text = '\n建议：将Chrome内核浏览器设置为默认浏览器\n作者:Jack_Cui')
-
-
+        label_warning = tk.Label(frame_3, fg = 'blue', font = ('楷体',12),text = '\n建议：将Chrome内核浏览器设置为默认浏览器\n作者:Shawn Li')
 
         #控件布局
         frame_1.pack()
@@ -113,7 +110,7 @@ class APP:
         _json - json格式数据
 
     Modify:
-        2017-05-11
+        2018.9.20
     """
     def loads_jsonp(self, _jsonp):
         try:
@@ -132,13 +129,13 @@ class APP:
         无
 
     Modify:
-        2017-05-09
+        2018.9.20
     """
     def video_play(self):
         #视频解析网站地址
-        port_1 = 'https://jx.618g.com/?url='
+        port_1 = 'http://jx.du2.cc/jx6.php?url='
         port_2 = 'http://jx.aeidu.cn/index.php?url='
-        port_3 = 'http://jx.du2.cc/jx6.php?url='
+        port_3 = 'https://jx.618g.com/?url='
 
         #正则表达是判定是否为合法链接
         if re.match(r'^https?:/{2}\w.+$', self.url.get()):
@@ -157,42 +154,6 @@ class APP:
                 ip = self.url.get()
                 ip = parse.quote_plus(ip)
                 webbrowser.open(port_3 + self.url.get())
-                #获取time、key、url
-                get_url = 'http://jx.aeidu.cn/index.php?url=%s' % ip
-                get_url_head = {
-                    'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.81 Safari/537.36',
-                    'Referer':'http://www.qmaile.com/',
-                }
-                get_url_req = request.Request(url = get_url, headers = get_url_head)
-                get_url_response = request.urlopen(get_url_req)
-                get_url_html = get_url_response.read().decode('utf-8')
-                bf = BeautifulSoup(get_url_html, 'lxml')
-                a = str(bf.find_all('script'))
-                pattern = re.compile('"api.php", {"time":"(\d+)", "key": "(.+)", "url": "(.+)","type"', re.IGNORECASE)
-                string = pattern.findall(a)
-                now_time = string[0][0]
-                now_key = string[0][1]
-                now_url = string[0][2]
-
-                #请求播放,获取Success = 1
-                get_movie_url = 'http://www.vipjiexi.com/x2/api.php'
-                get_movie_data = {
-                    'key':'%s' % now_key,
-                    'time':'%s' % now_time,
-                    'type':'',
-                    'url':'%s' % now_url
-                }
-                get_movie_head = {
-                    'User-Agent':'Mozilla/5.0 (Linux; Android 4.1.1; Nexus 7 Build/JRO03D) AppleWebKit/535.19 (KHTML, like Gecko) Chrome/18.0.1025.166  Safari/535.19',
-                    'Referer':'http://www.vipjiexi.com/x2/tong.php?',
-                    'url':'%s' % ip,
-                }
-                get_movie_req = request.Request(url = get_movie_url, headers = get_movie_head)
-                get_movie_data = parse.urlencode(get_movie_data).encode('utf-8')
-                get_movie_response = request.urlopen(get_movie_req, get_movie_data)
-                #请求之后立刻打开
-                webbrowser.open(get_url)
-
         else:
             msgbox.showerror(title='错误',message='视频链接地址无效，请重新输入！')
 
